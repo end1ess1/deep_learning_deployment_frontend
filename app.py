@@ -44,7 +44,7 @@ with tab1:
                     response = requests.post(
                         f"{API_URL.rstrip('/')}/predict",
                         files={"file": ("image.jpg", buf, "image/jpeg")},
-                        timeout=30,
+                        timeout=300,
                     )
                     response.raise_for_status()
                     result = response.json()
