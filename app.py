@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 from PIL import Image
 import io
-import matplotlib.pyplot as plt
 import numpy as np
 
 st.set_page_config(page_title="Street Objects Classifier", page_icon="🚗", layout="wide")
@@ -50,24 +49,23 @@ def get_prediction(image: Image.Image):
 
 
 def render_distribution(result):
-    """Отрисовывает результат и распределение вероятностей."""
-    st.success(f"**Класс:** {CLASSES_RU.get(result['predicted_class'], result['predicted_class'])}")
-    st.metric("Уверенность", f"{result['confidence']:.1%}")
+    """Отрисовывает прогноз нейросети с прогресс-барами."""
+    st.subheader("Прогноз нейросети:")
 
-    st.subheader("Распределение вероятностей")
     probs = result["probabilities"]
-    labels = [CLASSES_RU.get(k, k) for k in probs.keys()]
-    values = list(probs.values())
-    colors = ["#2ecc71" if k == result["predicted_class"] else "#3498db" for k in probs.keys()]
+    predicted = result["predicted_class"]
 
-    fig, ax = plt.subplots(figsize=(8, 4))
-    bars = ax.barh(labels, values, color=colors)
-    ax.set_xlim(0, 1)
-    ax.bar_label(bars, fmt="%.3f", padding=3)
-    ax.set_xlabel("Вероятность")
-    ax.axvline(x=0.5, color="gray", linestyle="--", linewidth=0.8)
-    plt.tight_layout()
-    st.pyplot(fig)
+    # Сортировка по убыванию вероятности
+    sorted_items = sorted(probs.items(), key=lambda x: x[1], reverse=True)
+
+    for cls, val in sorted_items:
+        val = float(val)
+        label = CLASSES_RU.get(cls, cls.capitalize())
+        col_text, col_val = st.columns([2, 1])
+        marker = " ✅" if cls == predicted else ""
+        col_text.markdown(f"**{label}**{marker}")
+        col_val.markdown(f"*{val * 100:.1f}%*")
+        st.progress(min(max(val, 0.0), 1.0))
 
 
 tab1, tab2 = st.tabs(["📁 Загрузить изображение", "✏️ Нарисовать"])
