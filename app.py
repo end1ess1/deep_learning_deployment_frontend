@@ -82,10 +82,9 @@ with tab1:
                     except Exception as e:
                         with col2:
                             st.error(f"Ошибка: {e}")
-        else:
-            # Если кнопка не нажата, показываем placeholder во второй колонке
-            with col2:
-                st.info("👈 Нажмите 'Классифицировать' для получения результата")
+        
+        with col2:
+            st.info("👈 Нажмите 'Классифицировать' для получения результата")
 
 with tab2:
     try:
